@@ -10,18 +10,38 @@ The index.html is a simple render/update loop with requestAnimationFrame, includ
 So far in the api:
 
 ```javascript
+
+//The main timer function
 var Timer = function(initialTicks) {
+
+    //the starting amount of ticks for the timer
     this.initialTicks = initialTicks || 0;
+    
+    //internal last time the timer was updated
     this.lastTimestamp = 0;
+    
+    //the last time the timer was paused
     this.pausedTime = 0;
+    
+    //the current amount of elapsed ticks
     this.ticks = this.initialTicks || 0;
+    
+    //amount the counter should count up or down, 1 resolves to 1 second in general
     this.maxStep = 1;
+    
+    //wether or not the timer should count up or down
     this.increment = true;
+    
+    //How fast/slow the timer increments/decrements
     this.scale = 1.0;
+    
+    //is the timer paused
     this.paused = false;
 
 };
 
+
+//The function to call in the update portion of your game loop
 Timer.prototype.step = function() {
     var current = Date.now();
     if (!this.paused) {
@@ -39,6 +59,8 @@ Timer.prototype.step = function() {
     this.lastTimestamp = current;
 
 };
+
+//returns an object containing the hours minutes and seconds of the timer
 Timer.prototype.getHMS = function() {
 
     var a = this.ticks;
@@ -53,7 +75,9 @@ Timer.prototype.getHMS = function() {
         s: b
     };
 
-}
+};
+
+//pause the timer or unpause the timer
 Timer.prototype.pause = function() {
     if (!this.paused) {
         this.pausedTime = this.ticks;
@@ -63,12 +87,18 @@ Timer.prototype.pause = function() {
         this.paused = false;
     }
 };
+
+//reset, but not stop, the timer
 Timer.prototype.reset = function() {
     this.ticks = this.initialTicks;
 };
+
+//start the timer if stopped or paused
 Timer.prototype.start = function() {
     this.paused = false;
 };
+
+//stop the timer and reset it
 Timer.prototype.stop = function() {
     this.pause();
     this.reset();

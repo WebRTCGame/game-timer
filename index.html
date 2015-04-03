@@ -43,14 +43,12 @@
                 var timer = new Timer(100);
 
                 function update(tframe) {
-                        var dt = tC.getDT(tframe);
+                    var dt = tC.getDT(tframe);
 
-                        timer.step();
-                        //game logic here
-                    }
-                    /*
-                                   
-                    */
+                    timer.step();
+                    //game logic here
+                }
+
                 function animate(tframe) {
 
                     requestAnimationFrame(animate);
