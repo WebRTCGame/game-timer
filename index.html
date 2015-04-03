@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>Game Timer Demo</title>
+
+    <script type='text/javascript' src='./timer.js'></script>
+
+    <style type='text/css'>
+    </style>
+
+
+
+    <script type='text/javascript'>
+        //<![CDATA[ 
+        window.onload = function() {
+
+                var c = document.getElementById("fun");
+                var ctx = c.getContext("2d");
+                var tC = {
+                    lastframe: 0,
+                    fpstime: 0,
+                    framecount: 0,
+                    fps: 0
+                };
+                tC.updateFps = function(dt) {
+                    if (this.fpstime > 0.25) {
+                        this.fps = Math.round(this.framecount / this.fpstime);
+                        this.fpstime = 0;
+                        this.framecount = 0;
+                    }
+                    this.fpstime += dt;
+                    this.framecount++;
+                };
+                tC.getDT = function(tframe) {
+                    var dt = (tframe - this.lastframe) / 1000;
+                    this.lastframe = tframe;
+                    this.updateFps(dt);
+                    return dt;
+                };
+
+                var timer = new Timer(100);
+
+                function update(tframe) {
+                        var dt = tC.getDT(tframe);
+
+                        timer.step();
+                        //game logic here
+                    }
+                    /*
+                                   
+                    */
+                function animate(tframe) {
+
+                    requestAnimationFrame(animate);
+                    update(tframe);
+
+                    render();
+
+                }
+
+                function render() {
+                    ctx.clearRect(0, 0, c.width, c.height);
+                    ctx.font = "20px Georgia";
+                    ctx.fillText(Date.now(), 10, 50);
+                    ctx.fillText("FPS: " + tC.fps, 10, 80);
+                    ctx.fillText(timer.ticks, 10, 120);
+                    ctx.fillText(JSON.stringify(timer.getHMS()), 10, 150);
+                };
+
+                function init() {
+                    document.getElementById("btnStart").addEventListener("click", function() {
+                        timer.start();
+                    }, false);
+                    document.getElementById("btnStop").addEventListener("click", function() {
+                        timer.stop();
+                    }, false);
+                    document.getElementById("btnPause").addEventListener("click", function() {
+                        timer.pause();
+                    }, false);
+                    document.getElementById("btnReset").addEventListener("click", function() {
+                        timer.reset();
+                    }, false);
+                    document.getElementById("btnReverse").addEventListener("click", function() {
+                        timer.increment = !timer.increment;
+                    }, false);
+
+                    animate(0);
+                }
+                init();
+            } //]]>
+    </script>
+
+
+</head>
+
+<body>
+    <canvas id="fun" height="400px"></canvas>
+    <br>
+    <button id="btnStart">start</button>
+    <button id="btnStop">stop</button>
+    <button id="btnPause">pause</button>
+    <button id="btnReset">reset</button>
+    <button id="btnReverse">reverse</button>
+
+</body>
+
+
+</html>
