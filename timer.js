@@ -32,24 +32,21 @@ var Timer = function(initialTicks) {
     this.scale = 1.0;
     this.paused = false;
     this.when = function() {};
+    this.onTick = function(){};
     return this;
 };
 
-Timer.prototype.onTick = function() {};
 
-Timer.prototype.HMStoS = function(value) {
-    var retVal = 0;
-    if (value.hasOwnProperty("h")) {
-        retVal = value["h"] * 3600;
-    }
-    if (value.hasOwnProperty("m")) {
-        retVal += value["m"] * 60;
-    }
-    if (value.hasOwnProperty("s")) {
-        retVal += value["s"];
-    }
-    return retVal;
+
+
+Timer.prototype.HMStoS = function(a) {
+  var b = 0;
+  a.hasOwnProperty("h") && (b = 3600 * a.h);
+  a.hasOwnProperty("m") && (b += 60 * a.m);
+  a.hasOwnProperty("s") && (b += a.s);
+  return b;
 };
+
 Timer.prototype.step = function() {
     var current = Date.now();
     if (!this.paused) {
