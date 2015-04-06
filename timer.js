@@ -65,7 +65,7 @@ Timer.prototype.step = function() {
 
     }
     this.lastTimestamp = current;
-
+    return this;
 };
 Timer.prototype.getHMS = function() {
 
@@ -82,7 +82,7 @@ Timer.prototype.getHMS = function() {
     };
 
 };
-Timer.prototype.getHMSObj = function(){
+Timer.prototype.getHMSObj = function() {
     return JSON.stringify(this.getHMS());
 };
 Timer.prototype.pause = function() {
@@ -93,15 +93,18 @@ Timer.prototype.pause = function() {
     else {
         this.paused = false;
     }
+    return this;
 };
 Timer.prototype.reset = function() {
     this.ticks = this.initialTicks;
+    return this;
 };
 Timer.prototype.start = function() {
     this.paused = false;
+    return this;
 };
 Timer.prototype.stop = function() {
     this.pause();
     this.reset();
-
+    return this;
 };
