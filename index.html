@@ -40,7 +40,25 @@
                     return dt;
                 };
 
-                var timer = new Timer(100);
+                var timer = new Timer({
+                    h: 0,
+                    m: 5,
+                    s: 10
+                });
+
+                timer.when = function(newValue) {
+                    if (Math.round(newValue) >= Math.round(timer.HMStoS({
+                            h: 0,
+                            m: 5,
+                            s: 15
+                        }))) {
+                        timer.reset();
+                    }
+                };
+
+                timer.onTick = function() {
+                    console.log(timer.ticks)
+                };
 
                 function update(tframe) {
                     var dt = tC.getDT(tframe);
@@ -64,7 +82,7 @@
                     ctx.fillText(Date.now(), 10, 50);
                     ctx.fillText("FPS: " + tC.fps, 10, 80);
                     ctx.fillText(timer.ticks, 10, 120);
-                    ctx.fillText(JSON.stringify(timer.getHMS()), 10, 150);
+                    ctx.fillText(timer.getHMSObj(), 10, 150);
                 };
 
                 function init() {

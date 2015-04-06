@@ -1,15 +1,55 @@
 var Timer = function(initialTicks) {
-    this.initialTicks = initialTicks || 0;
+
+    if (typeof initialTicks === "number") {
+        this.initialTicks = initialTicks || 0;
+    }
+    else {
+        this.initialTicks = this.HMStoS(initialTicks);
+    }
+
+
     this.lastTimestamp = 0;
     this.pausedTime = 0;
-    this.ticks = this.initialTicks || 0;
+    var _ticks = this.initialTicks || 0;
+
+    Object.defineProperty(this, 'ticks', {
+        get: function() {
+            return _ticks;
+        },
+        set: function(newValue) {
+            if (newValue !== _ticks) {
+                _ticks = newValue;
+                this.onTick();
+                this.when(_ticks);
+            }
+
+        },
+        enumerable: true,
+        configurable: true
+    });
     this.maxStep = 1;
     this.increment = true;
     this.scale = 1.0;
     this.paused = false;
-
+    this.when = function() {};
+    return this;
 };
 
+Timer.prototype.onTick = function() {};
+
+Timer.prototype.HMStoS = function(value) {
+    var retVal = 0;
+    if (value.hasOwnProperty("h")) {
+        retVal = value["h"] * 3600;
+    }
+    if (value.hasOwnProperty("m")) {
+        retVal += value["m"] * 60;
+    }
+    if (value.hasOwnProperty("s")) {
+        retVal += value["s"];
+    }
+    return retVal;
+};
 Timer.prototype.step = function() {
     var current = Date.now();
     if (!this.paused) {
@@ -22,7 +62,7 @@ Timer.prototype.step = function() {
         else {
             this.ticks -= (Math.min(delta, this.maxStep) * this.scale);
         }
-        
+
     }
     this.lastTimestamp = current;
 
@@ -41,7 +81,10 @@ Timer.prototype.getHMS = function() {
         s: b
     };
 
-}
+};
+Timer.prototype.getHMSObj = function(){
+    return JSON.stringify(this.getHMS());
+};
 Timer.prototype.pause = function() {
     if (!this.paused) {
         this.pausedTime = this.ticks;
