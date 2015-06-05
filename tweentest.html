@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>Game Timer Demo</title>
+    <script type='text/javascript' src='./vector.js'></script>
+    <script type='text/javascript' src='./renderable.js'></script>
+    <script type='text/javascript' src='./timer.js'></script>
+    <script type='text/javascript' src='https://rawgit.com/sole/tween.js/master/src/Tween.js'></script>
+    <script type='text/javascript' src='./Segment2.js'></script>
+    <style type='text/css'>
+        #fun {
+            border: 1px solid black;
+            /* -webkit-filter: drop-shadow(16px 16px 10px black); */
+        }
+    </style>
+
+
+
+    <script type='text/javascript'>
+        //<![CDATA[ 
+        function randomIntFromInterval(min, max) {
+            return Math.floor(Math.random() * (max - min + 1) + min);
+        }
+
+        window.onload = function() {
+                var position = {
+                        x: 100,
+                        y: 300,
+                        width: 100
+                    },
+                    position2 = {
+                        x: 200,
+                        y: 300,
+                        width: 100
+                    },
+                    segment0 = new Segment(100, 20),
+                    segment1 = new Segment(100, 20),
+                    highHit = {
+                        x: 400,
+                        y: 200
+                    },
+                    medHit = {
+                        x: 400,
+                        y: 250
+                    },
+                    lowHit = {
+                        x: 400,
+                        y: 300
+                    },
+                    segments = [],
+                    numSegments = 5,
+                    spineLen = 35,
+                    target;
+                console.log(segment0);
+                while (numSegments--) {
+                    segments.push(new Segment(spineLen, 10));
+                }
+                segments[segments.length - 1].x = 200;
+                segments[segments.length - 1].y = 400;
+                segments[segments.length - 1].color = 'green';
+
+                function reach(segment, xpos, ypos) {
+                    var dx = xpos - segment.x,
+                        dy = ypos - segment.y;
+                    segment.rotation = Math.atan2(dy, dx);
+                    var w = segment.getPin().x - segment.x,
+                        h = segment.getPin().y - segment.y;
+                    return {
+                        x: xpos - w,
+                        y: ypos - h
+                    };
+                }
+
+                function position(segmentA, segmentB) {
+                    segmentA.x = segmentB.getPin().x;
+                    segmentA.y = segmentB.getPin().y;
+                };
+
+                function move(segment, i) {
+                    if (i !== 0) {
+                        target = reach(segment, target.x, target.y);
+                        segments[i - 1].x = segment.pinX();
+                        segments[i - 1].y = segment.pinY();
+                    }
+                };
+
+                function draw(segment) {
+                    segment.render(ctx);
+                }
+                segment0.color = 'red';
+                segment1.color = 'blue';
+                var c = document.getElementById("fun");
+                var ctx = c.getContext("2d");
+
+                segment1.x = 205; //c.width / 2;
+                segment1.y = 250; //c.height / 2;
+
+                var tC = {
+                    lastframe: 0,
+                    fpstime: 0,
+                    framecount: 0,
+                    fps: 0
+                };
+                tC.updateFps = function(dt) {
+                    if (this.fpstime > 0.25) {
+                        this.fps = Math.round(this.framecount / this.fpstime);
+                        this.fpstime = 0;
+                        this.framecount = 0;
+                    }
+                    this.fpstime += dt;
+                    this.framecount++;
+                };
+                tC.getDT = function(tframe) {
+                    var dt = (tframe - this.lastframe) / 1000;
+                    this.lastframe = tframe;
+                    this.updateFps(dt);
+                    return dt;
+                };
+
+                var timer = new Timer({
+                    h: 0,
+                    m: 5,
+                    s: 10
+                });
+
+                timer.when = function(newValue) {
+                    if (Math.round(newValue) >= Math.round(timer.HMStoS({
+                            h: 0,
+                            m: 5,
+                            s: 15
+                        }))) {
+                        timer.reset();
+                    }
+                };
+
+                timer.onTick = function() {
+                    //console.log(timer.ticks)
+                };
+
+                function update(tframe) {
+                    var dt = tC.getDT(tframe);
+
+                    timer.step();
+                    TWEEN.update(tframe);
+                    segment0.width = position.width;
+                    segment1.width = position2.width;
+                    segment1.x = position2.x;
+                    segment1.y = position2.y;
+                    segments[segments.length - 1].x = segment1.x;
+                    segments[segments.length - 1].y = 400; //segment1.y + (numSegments*spineLen);
+                    var dx = position.x - segment1.x,
+                        dy = position.y - segment1.y,
+                        dist = Math.sqrt(dx * dx + dy * dy),
+                        a = 100,
+                        b = 100,
+                        c = Math.min(dist, a + b),
+                        B = Math.acos((b * b - a * a - c * c) / (-2 * a * c)),
+                        C = Math.acos((c * c - a * a - b * b) / (-2 * a * b)),
+                        D = Math.atan2(dy, dx),
+                        E = D + B + Math.PI + C;
+
+                    segment1.rotation = (D + B);
+
+                    //var target = segment1.getPin();
+                    segment0.x = segment1.pinX(); //target.x;
+                    segment0.y = segment1.pinY(); //target.y;
+                    segment0.rotation = E;
+
+
+
+                    target = reach(segments[0], position2.x, position2.y);
+                    segments.forEach(move);
+                    //game logic here
+                }
+
+                function animate(tframe) {
+
+                    requestAnimationFrame(animate);
+                    update(tframe);
+                    render();
+
+                }
+
+                function render() {
+                    //ctx.fillStyle = 'rgba(255,255,255,1)';
+                    ctx.clearRect(0, 0, c.width, c.height);
+                    ctx.fillStyle = 'black';
+                    ctx.font = "12px Georgia";
+                    //ctx.fillText(Date.now(), 10, 50);
+                    ctx.save();
+                    if (tC.fps < 60) {
+                        ctx.fillStyle = 'red';
+                    };
+                    ctx.fillText("FPS: " + tC.fps, c.width - 50, 10);
+                    ctx.restore();
+
+                    ctx.font = "20px Georgia";
+                    ctx.fillText(timer.ticks, 10, 30);
+                    ctx.fillText(timer.getHMSObj(), 10, 60);
+
+
+                    segment1.render(ctx);
+                    segment0.render(ctx);
+                    ctx.save();
+
+                    ctx.beginPath();
+                    ctx.arc(position.x, position.y, 20, 0, 2 * Math.PI, false);
+                    ctx.fillStyle = 'rgba(0,255,0,0.25)';
+                    ctx.fill();
+                    ctx.lineWidth = 2;
+                    ctx.strokeStyle = '#003300';
+                    ctx.stroke();
+                    ctx.restore();
+
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.arc(highHit.x, highHit.y, 20, 0, 2 * Math.PI, false);
+                    ctx.fillStyle = 'rgba(255,0,0,0.25)';
+                    ctx.fill();
+                    ctx.lineWidth = 2;
+                    ctx.strokeStyle = 'red';
+                    ctx.stroke();
+                    ctx.restore();
+
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.arc(medHit.x, medHit.y, 20, 0, 2 * Math.PI, false);
+                    ctx.fillStyle = 'rgba(0,255,0,0.25)';
+                    ctx.fill();
+                    ctx.lineWidth = 2;
+                    ctx.strokeStyle = 'green';
+                    ctx.stroke();
+                    ctx.restore();
+
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.arc(lowHit.x, lowHit.y, 20, 0, 2 * Math.PI, false);
+                    ctx.fillStyle = 'rgba(0,0,255,0.25)';
+                    ctx.fill();
+                    ctx.lineWidth = 2;
+                    ctx.strokeStyle = 'blue';
+                    ctx.stroke();
+                    ctx.restore();
+
+                    segments.forEach(draw);
+                };
+
+                function init() {
+
+                    btnClick("btnStart", function() {
+                        timer.start();
+                    });
+                    btnClick("btnStop", function() {
+                        timer.stop();
+                    });
+                    btnClick("btnPause", function() {
+                        timer.pause();
+                    });
+                    btnClick("btnReset", function() {
+                        timer.reset();
+                    });
+                    btnClick("btnReverse", function() {
+                        timer.increment = !timer.increment;
+                    });
+
+
+
+                    var tweenHighHit = new TWEEN.Tween(position)
+                        .to({
+                            x: highHit.x,
+                            y: highHit.y,
+                            width: 100
+                        }, 2000)
+                        .easing(TWEEN.Easing.Elastic.InOut)
+                        //.repeat(0)
+                        .delay(1000)
+                        //.onUpdate(function() {})
+                        //.onStart(function() {})
+                        //.onStop(function() {})
+                        .onComplete(function() {
+                            tweenReset.start();
+                        });
+
+                    var tweenMedHit = new TWEEN.Tween(position)
+                        .to({
+                            x: medHit.x,
+                            y: medHit.y,
+                            width: 100
+                        }, 2000)
+                        .easing(TWEEN.Easing.Elastic.InOut)
+                        //.repeat(0)
+                        .delay(1000)
+                        //.onUpdate(function() {})
+                        //.onStart(function() {})
+                        //.onStop(function() {})
+                        .onComplete(function() {
+                            tweenReset.start();
+                        });
+
+                    var tweenLowHit = new TWEEN.Tween(position)
+                        .to({
+                            x: lowHit.x,
+                            y: lowHit.y,
+                            width: 100
+                        }, 2000)
+                        .easing(TWEEN.Easing.Elastic.InOut)
+                        //.repeat(0)
+                        .delay(1000)
+                        //.onUpdate(function() {})
+                        //.onStart(function() {})
+                        //.onStop(function() {})
+                        .onComplete(function() {
+                            tweenReset.start();
+                        });
+
+                    var tweenReset = new TWEEN.Tween(position)
+                        .to({
+                            x: 275,
+                            y: 325,
+                            width: 100
+                        }, 1000)
+                        .easing(TWEEN.Easing.Back.InOut)
+                        .repeat(0)
+                        .delay(0)
+                        //.onUpdate(function() {})
+                        .onStart(function() {
+                            //TW_Seg0Len.start();
+                        })
+                        .onStop(function() {})
+                        .onComplete(function() {
+                            var rand = randomIntFromInterval(0, 2);
+                            if (rand === 0) {
+                                tweenHighHit.start();
+                            }
+                            else if (rand === 1) {
+                                tweenMedHit.start();
+                            }
+                            else if (rand === 2) {
+                                tweenLowHit.start();
+                            }
+                            //tween2.start();
+                        });
+                    //tween.chain(tween2);
+                    //tween2.chain(tween);
+                    tweenReset.start();
+
+
+                    var tween3 = new TWEEN.Tween(position2)
+                        .to({
+                            x: 200,
+                            y: 250
+                        }, 1000)
+                        .easing(TWEEN.Easing.Back.InOut)
+                        .repeat(Infinity)
+                        .delay(0)
+                        .yoyo(true)
+                        //.onUpdate(function() {})
+                        .onStart(function() {})
+                        .onStop(function() {})
+                        .onComplete(function() {
+                            //tween2.start();
+                        });
+                    tween3.start();
+
+                    animate(0);
+                }
+
+                function btnClick(id, fnc) {
+                    document.getElementById(id).addEventListener("click", fnc, false);
+                };
+                init();
+            } //]]>
+    </script>
+
+
+</head>
+
+<body>
+    <canvas id="fun" height="500px" width="600px"></canvas>
+    <br>
+    <button id="btnStart">start</button>
+    <button id="btnStop">stop</button>
+    <button id="btnPause">pause</button>
+    <button id="btnReset">reset</button>
+    <button id="btnReverse">reverse</button>
+
+</body>
+
+
+</html>

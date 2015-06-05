@@ -6,6 +6,7 @@
     <title>Game Timer Demo</title>
 
     <script type='text/javascript' src='./timer.js'></script>
+    
 
     <style type='text/css'>
     </style>
@@ -57,7 +58,7 @@
                 };
 
                 timer.onTick = function() {
-                    console.log(timer.ticks)
+                    //console.log(timer.ticks)
                 };
 
                 function update(tframe) {
@@ -70,8 +71,11 @@
                 function animate(tframe) {
 
                     requestAnimationFrame(animate);
+                    
+                    /*update logic*/
                     update(tframe);
 
+                    /*render game*/
                     render();
 
                 }

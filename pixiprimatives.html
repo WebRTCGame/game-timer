@@ -1,0 +1,254 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <title>pixi.js example 13 - Graphics</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: white;
+        }
+    </style>
+
+    <script src="https://cdn.rawgit.com/GoodBoyDigital/pixi.js/dev/bin/pixi.js"></script>
+    <script type='text/javascript' src='./rangedvalue.js'></script>
+</head>
+
+<body>
+    <script>
+        var tC = {
+            lastframe: 0,
+            fpstime: 0,
+            framecount: 0,
+            fps: 0
+        };
+        tC.updateFps = function(dt) {
+            if (this.fpstime > 0.25) {
+                this.fps = Math.round(this.framecount / this.fpstime);
+                this.fpstime = 0;
+                this.framecount = 0;
+            }
+            this.fpstime += dt;
+            this.framecount++;
+        };
+        tC.getDT = function(tframe) {
+            var dt = (tframe - this.lastframe) / 1000;
+            this.lastframe = tframe;
+            this.updateFps(dt);
+            return dt;
+        };
+
+        function rgbToHex(r, g, b) {
+            return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+        }
+
+        function cl(r, g, b) {
+            return PIXI.utils.rgb2hex([~~r, ~~g, ~~b]);
+        };
+
+        /*
+                var renderer = PIXI.autoDetectRenderer(800, 600, {
+                    antialias: false
+                });
+          */
+        var renderer = new PIXI.WebGLRenderer(1920 / 3, 1080 / 3);
+        document.body.appendChild(renderer.view);
+        //var ratty =  document.body.clientWidth / renderer.width;
+        var ratty = window.innerWidth / renderer.width;
+        console.log(ratty);
+        renderer.view.style.width = document.body.clientWidth + 'px';
+        renderer.view.style.height = renderer.height * ratty + 'px';
+        // create the root of the scene graph
+        var stage = new PIXI.Container();
+
+        stage.interactive = true;
+
+        var graphics = new PIXI.Graphics();
+        //graphics.boundsPadding = 0;
+        /*
+                // set a fill and line style
+                graphics.beginFill(0xFF3300);
+                graphics.lineStyle(10, 0xffd900, 1);
+
+                // draw a shape
+                graphics.moveTo(50, 50);
+                graphics.lineTo(250, 50);
+                graphics.lineTo(100, 100);
+                graphics.lineTo(250, 220);
+                graphics.lineTo(50, 220);
+                graphics.lineTo(50, 50);
+                graphics.endFill();
+
+                // set a fill and line style again
+                graphics.lineStyle(10, 0xFF0000, 0.8);
+                graphics.beginFill(0xFF700B, 1);
+
+                // draw a second shape
+                graphics.moveTo(210, 300);
+                graphics.lineTo(450, 320);
+                graphics.lineTo(570, 350);
+                graphics.quadraticCurveTo(600, 0, 480, 100);
+                graphics.lineTo(330, 120);
+                graphics.lineTo(410, 200);
+                graphics.lineTo(210, 300);
+                graphics.endFill();
+
+                // draw a rectangle
+                graphics.lineStyle(2, 0x0000FF, 1);
+                graphics.drawRect(50, 250, 100, 100);
+
+                // draw a circle
+                graphics.lineStyle(0);
+                graphics.beginFill(0xFFFF0B, 0.5);
+                graphics.drawCircle(470, 200, 100);
+                graphics.endFill();
+
+                graphics.lineStyle(20, 0x33FF00);
+                graphics.moveTo(30, 30);
+                graphics.lineTo(600, 300);
+        */
+
+        stage.addChild(graphics);
+
+        // let's create a moving shape
+        var thing = new PIXI.Graphics();
+        stage.addChild(thing);
+        thing.position.x = 620 / 2;
+        thing.position.y = 380 / 2;
+
+        var progBar1 = new PIXI.Graphics();
+        stage.addChild(progBar1);
+        progBar1.lineStyle(2, 0x0000FF, 1);
+        progBar1.beginFill(0xFF700B, 1);
+        progBar1.drawRect(0, 0, stage.width / 2, 30);
+        //progBar1.boundsPadding = 0;
+        progBar1.position.x = 30;
+        progBar1.position.y = 30;
+        var progBarBar = new PIXI.Graphics();
+        //progBarBar.lineStyle(2, 0x0000FF, 1);
+        //progBarBar.beginFill(0x009900, 1);
+        //progBarBar.drawRect(55, 255, 210, 110);
+        progBar1.addChild(progBarBar);
+
+
+
+
+        var val = new range(3, 2, 10);
+        val.setValues(6, 4, 20);
+        val.percentage = 50;
+        var countUp = true;
+        val.minHitCallback = function() {
+            countUp = !countUp;
+        };
+        val.maxHitCallback = function() {
+            countUp = !countUp;
+        };
+        //progBarBar.width = 100;
+        var style = {
+            font: '24px Arial bold italic',
+            fill: rgbToHex(255, 255, 255),
+            stroke: rgbToHex(0, 0, 0),
+            strokeThickness: 5,
+            //dropShadow: false,
+            //dropShadowColor: '#000000',
+            // dropShadowAngle: Math.PI / 6,
+            // dropShadowDistance: 6,
+            wordWrap: true,
+            wordWrapWidth: 440
+        };
+
+        var richText = new PIXI.Text('Rich text with a lot of options and across multiple lines', style);
+        richText.x = 30;
+        richText.y = 180;
+
+        stage.addChild(richText);
+
+        var richText2 = new PIXI.Text('Rich text with a lot of options and across multiple lines', style);
+        richText2.x = 30;
+        richText2.y = 230;
+
+        stage.addChild(richText2);
+
+        var count = 0;
+
+        // Just click on the stage to draw random lines
+        stage.on('click', onClick);
+        stage.on('tap', onClick);
+
+        function onClick() {
+                graphics.lineStyle(Math.random() * 30, Math.random() * 0xFFFFFF, 1);
+                graphics.moveTo(Math.random() * 620, Math.random() * 380);
+                graphics.bezierCurveTo(Math.random() * 620, Math.random() * 380,
+                    Math.random() * 620, Math.random() * 380,
+                    Math.random() * 620, Math.random() * 380);
+            }
+            // run the render loop
+
+        var strokeWidth = 4;
+
+        function update(tframe) {
+            var dt = tC.getDT(tframe);
+            richText.text = val.percentage;
+            richText2.text = progBar1.getLocalBounds().width + " / " + (progBar1.getLocalBounds().width - strokeWidth);
+
+
+            if (countUp) {
+                val.current += 5 * dt;
+            }
+            else {
+                val.current -= 5 * dt;
+            }
+
+            //progBar1.position.x += 0.1;
+            //progBar1.rotation += 0.01;
+        };
+
+        function render() {
+            progBar1.clear();
+            progBar1.lineStyle(strokeWidth, 0x0000FF, 1);
+            progBar1.beginFill(0xFF700B, 1);
+            progBar1.drawRect(0, 0, progBar1.getLocalBounds().width - strokeWidth * 2, 30);
+            //var rect = progBar1.getBounds();
+            //progBar1.drawRect(rect.x,rect.y,rect.width,rect.height);
+            //progBar1.drawRect(0,0,progBar1.width,progBar1.height);
+            //progBarBar.clear();
+            progBar1.lineStyle(2, 0x0000FF, 1);
+            progBar1.beginFill(cl(val.getPercColor(), 255 - val.getPercColor(), 0), 1);
+            var progBar1Width = val.copyPercent(0, 200) - (strokeWidth * 2);
+            progBar1.drawRect(0, 0, progBar1Width, progBar1.getLocalBounds().height - strokeWidth * 2);
+
+            renderer.render(stage);
+        };
+
+        function animate(tframe) {
+            /*
+                        thing.clear();
+
+                        count += 0.1;
+
+                        thing.clear();
+                        thing.lineStyle(10, 0xff0000, 1);
+                        thing.beginFill(0xffFF00, 0.5);
+
+                        thing.moveTo(-120 + Math.sin(count) * 20, -100 + Math.cos(count) * 20);
+                        thing.lineTo(120 + Math.cos(count) * 20, -100 + Math.sin(count) * 20);
+                        thing.lineTo(120 + Math.sin(count) * 20, 100 + Math.cos(count) * 20);
+                        thing.lineTo(-120 + Math.cos(count) * 20, 100 + Math.sin(count) * 20);
+                        thing.lineTo(-120 + Math.sin(count) * 20, -100 + Math.cos(count) * 20);
+
+                        thing.rotation = count * 0.1;
+                        */
+            //richText.clear();
+            requestAnimationFrame(animate);
+            update(tframe);
+            render();
+        }
+
+
+        animate(0);
+    </script>
+
+</body>
+
+</html>
