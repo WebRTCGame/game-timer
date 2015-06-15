@@ -35,20 +35,20 @@
 
 	// build a rope!
 	var length = 918 / 20;
-	points = [];
+	var points = [];
 	for (var i = 0; i < 20; i++) {
-		var segSize = length;
+	//	var segSize = length;
 		points.push(new PIXI.Point(i * length, 0));
-	};
+	}
 
-	strip = new PIXI.Rope(PIXI.Texture.fromImage("snake.png"), points);
+	var strip = new PIXI.Rope(PIXI.Texture.fromImage("snake.png"), points);
 	strip.x = -918/2;
 	
 	var snakeContainer = new PIXI.DisplayObjectContainer();
 	snakeContainer.position.x = window.innerWidth/2;
 	snakeContainer.position.y = window.innerHeight/2;
 
-	snakeContainer.scale.set( window.innerWidth / 1100)
+	snakeContainer.scale.set( window.innerWidth / 1100);
 	stage.addChild(snakeContainer);
 
 	snakeContainer.addChild(strip);

@@ -4,15 +4,15 @@
 // helper library to work with vectors
 
 
-function Point(x,y){
+export function Point(x, y) {
 	this.x = x || 0;
 	this.y = y || 0;
 };
 
-Point.prototype.toVector = function(){
-	return new Vector(this.x,this.y);
+Point.prototype.toVector = function() {
+	return new Vector(this.x, this.y);
 };
-function Vector(x, y) {
+export default function Vector(x, y) {
 	this.x = x || 0;
 	this.y = y || 0;
 }
@@ -39,7 +39,7 @@ Vector.prototype = {
 
 		return this;
 	},
-	subtract: function(v){
+	subtract: function(v) {
 		return this.sub(v);
 	},
 
@@ -49,8 +49,8 @@ Vector.prototype = {
 
 		return this;
 	},
-	multiply: function(s){
-		
+	multiply: function(s) {
+
 		return this.mul(s);
 	},
 	div: function(s) {
@@ -61,20 +61,20 @@ Vector.prototype = {
 
 		return this;
 	},
-	divide: function(s){
+	divide: function(s) {
 		return this.div(s)
 	},
 	mag: function() {
 		return Math.sqrt(this.x * this.x + this.y * this.y);
 	},
-	magnitude: function(){
+	magnitude: function() {
 		return Math.sqrt(this.x * this.x + this.y * this.y);
 	},
-	length: function(){
+	length: function() {
 		return this.mag();
 	},
-	truncate: function(value){
-		if (this.length()>value){
+	truncate: function(value) {
+		if (this.length() > value) {
 			this.normalize();
 			this.multiply(value);
 		}
@@ -137,7 +137,7 @@ Vector.prototype = {
 		const dy = this.y - v.y;
 		return Math.sqrt(dx * dx + dy * dy);
 	},
-	near: function(v,length){
+	near: function(v, length) {
 		return this.dist(v) < length;
 	},
 	copy: function() {
@@ -194,29 +194,49 @@ Vector.prototype = {
 	perpRight: function() {
 		return new Vector(-this.y, this.x);
 	},
-	clamp: function(vMin,vMax){
-		if (this.x < vMin.x) {this.x = vMin.x} else if (this.x > vMax.x){this.x = vMax.x}
-		if (this.y < vMin.y){this.y = vMin.y}else if (this.y > vMax.y){this.y = vMax.y}
+	clamp: function(vMin, vMax) {
+		if (this.x < vMin.x) {
+			this.x = vMin.x
+		}
+		else if (this.x > vMax.x) {
+			this.x = vMax.x
+		}
+		if (this.y < vMin.y) {
+			this.y = vMin.y
+		}
+		else if (this.y > vMax.y) {
+			this.y = vMax.y
+		}
 		return this;
 	},
-	clampScalar: function(min,max){
-		if (this.x < min) {this.x = min} else if (this.x > max){this.x = max}
-		if (this.y < min){this.y = min}else if (this.y > max){this.y = max}
+	clampScalar: function(min, max) {
+		if (this.x < min) {
+			this.x = min
+		}
+		else if (this.x > max) {
+			this.x = max
+		}
+		if (this.y < min) {
+			this.y = min
+		}
+		else if (this.y > max) {
+			this.y = max
+		}
 		return this;
 	},
-	ceil: function(){
+	ceil: function() {
 		this.x = Math.ceil(this.x);
 		this.y = Math.ceil(this.y);
 		return this;
 	},
-	floor: function(){
+	floor: function() {
 		this.x = Math.floor(this.x);
 		this.y = Math.floor(this.y);
 		return this;
 	},
-	negate: function(){
-		this.x = - this.x;
-		this.y = - this.y;
+	negate: function() {
+		this.x = -this.x;
+		this.y = -this.y;
 		return this;
 	}
 };

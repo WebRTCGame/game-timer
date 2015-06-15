@@ -185,7 +185,36 @@
        copyPercent: function(newMin, newMax) {
            return ((this.clamp(this.percentage, 0, 100) / 100) * (newMax - newMin)) + newMin;
        },
-       getPercColor: function(){
+       getPercColor: function() {
            return ~~this.copyPercent(0, 255);
        }
    };
+
+
+   class es6range {
+
+       constructor(icurrent, imin, imax, iminHitCallback, imaxHitCallback) {
+           this._minHitCallback = iminHitCallback;
+           this._maxHitCallback = imaxHitCallback;
+           this._current = icurrent;
+           this._min = imin;
+           this._max = imax;
+       }
+
+       get prop() {
+           return 'getter';
+       }
+       set prop(value) {
+           console.log('setter: ' + value + " " + this.something);
+       }
+
+       get minHitCallback() {
+           return this._minHitCallback;
+       }
+       set minHitCallback(value) {
+           value !== this._minHitCallback && ('function' === typeof value) && (this._minHitCallback = value);
+       }
+   }
+
+   let r = new range(1, 2, 3);
+   r.prop = 5;

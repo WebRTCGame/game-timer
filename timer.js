@@ -1,4 +1,4 @@
-var Timer = function(initialTicks) {
+export var Timer = function(initialTicks) {
 
     if (typeof initialTicks === "number") {
         this.initialTicks = initialTicks || 0;

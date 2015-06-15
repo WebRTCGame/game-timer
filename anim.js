@@ -21,7 +21,7 @@ tCx.getDT = function(tframe) {
 };
 */
 console.log("tC loaded");
-var tC = {
+export var tC = {
     lastframe: 0,
     fpstime: 0,
     framecount: 0,
