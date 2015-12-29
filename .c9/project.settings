@@ -24,12 +24,23 @@
         "@unusedFunctionArgs": "false",
         "@warnLevel": "info"
     },
+    "python": {
+        "@version": "python2"
+    },
     "run": {
         "@path": "/.c9/runners",
         "@runner": "Apache httpd (PHP, HTML)",
         "configs": {
             "@inited": "true",
-            "json()": {}
+            "json()": {
+                "buildit": {
+                    "command": "build.js",
+                    "debug": true,
+                    "default": true,
+                    "name": "buildit",
+                    "runner": "Node.js (default)"
+                }
+            }
         }
     },
     "share": {
